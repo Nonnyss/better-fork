@@ -20,6 +20,6 @@ export type Row = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'fork-tree': { rows: Row[] }
+    'better-fork': { rows: Row[] }
   }
 }

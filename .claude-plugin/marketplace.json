@@ -1,5 +1,5 @@
 {
   "name": "local-mods",
   "owner": { "name": "nonnyss" },
-  "plugins": [{ "name": "fork-tree", "source": "./fork-tree" }]
+  "plugins": [{ "name": "better-fork", "source": "./better-fork" }]
 }

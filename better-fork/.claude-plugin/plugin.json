@@ -1,0 +1,1 @@
+{ "name": "better-fork", "version": "0.1.0", "description": "Sidebar that draws every session as a fork tree with its status", "types": "./types/index.d.ts" }

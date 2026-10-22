@@ -2,10 +2,10 @@ import { expect, mock, test, type Engine } from 'claude-code/testing'
 import type { On, RenderSurface } from 'claude-code'
 
 const PANE = {
-  plugin: 'fork-tree',
+  plugin: 'better-fork',
   component: 'Pane',
-  requestId: 'fork-tree',
-  props: { title: 'Fork tree', isFocused: false, bodyColumns: 40, placement: 'dock', scroll: { offset: 0, bodyRows: 30 }, view: {} },
+  requestId: 'better-fork',
+  props: { title: 'better-fork', isFocused: false, bodyColumns: 40, placement: 'dock', scroll: { offset: 0, bodyRows: 30 }, view: {} },
 } as const
 
 const NOW = Date.parse('2026-10-22T12:00:00Z')
@@ -53,7 +53,7 @@ async function start($: Engine, on: On, resumeText = '', extra: Record<string, s
   })
   on('fs.stat', (_, e) => ({ value: { kind: 'file', size: 1, mtimeMs: e.path in disk ? 1 : 0, isLink: false } }))
   on('fs.exists', (_, e) => ({ value: TRANSCRIPTS.has(e.path) }))
-  on('command.register', () => ({ value: { command: 'fork-tree' } }))
+  on('command.register', () => ({ value: { command: 'better-fork' } }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
   on('ui.copy', () => ({ value: { isCopied: true } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
@@ -180,7 +180,7 @@ test('a session no surface draws reads nothing and opens the pane only once one 
   let surfaces: RenderSurface[] = []
   on('session.surfaces', () => ({ value: surfaces }))
   on('session.id', () => ({ value: 'me' }))
-  on('command.register', () => ({ value: { command: 'fork-tree' } }))
+  on('command.register', () => ({ value: { command: 'better-fork' } }))
   const opened: boolean[] = []
   on('ui.open', () => {
     opened.push(surfaces.length > 0)
@@ -282,7 +282,7 @@ test('a session running an older copy of the mod says to reload it', async ($, o
   mod.mtimeMs = 2
   await clock.advance(5000)
 
-  expect(statuses).toEqual([undefined, 'fork-tree updated · run /reload-plugins'])
+  expect(statuses).toEqual([undefined, 'better-fork updated · run /reload-plugins'])
 })
 
 test('a file read half-written comes back on the next scan', async ($, on) => {
