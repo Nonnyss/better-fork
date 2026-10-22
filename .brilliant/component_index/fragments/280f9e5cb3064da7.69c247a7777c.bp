@@ -1,0 +1,3 @@
+        280f9e5cb3064da7 fr comp p(0,67.8) s(hug:336,hug:17.5) f[] "Key hints"
+          4c0ff7c471905edb al(h,g(0:$spacing.none),pad(0:$spacing.none)) mref(4c0ff7c471905edb) p(0,0) s(336,hug:17.5) f[(8871357990ca4f1c,tok(color.surface,#28282C))] "Frame 9"
+            5fff146ecf2cb8eb t("⏎ here · t new tab · m menu · ←→ fold",JetBrains Mono,14,r,align(l),lh(1.25)) mref(5fff146ecf2cb8eb) p(0,0) s(hug:310.8,hug:17.5) f[(5f6b1735ac259053,tok(color.tree.dim,#55555D))] $typography.row "Text 27"

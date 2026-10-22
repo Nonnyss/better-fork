@@ -1,0 +1,16 @@
+{
+  "version": 5,
+  "migratedAt": "2026-10-22T04:22:26.460117Z",
+  "stats": {
+    "filesScanned": 1,
+    "filesRewritten": 0,
+    "refsHealed": 0,
+    "refsCrossCanvasRepointed": 0,
+    "refsNameHealed": 0,
+    "refsNameHealedCrossCanvas": 0,
+    "refsCanvasQualified": 0,
+    "mastersRenamed": 0,
+    "danglingByClass": {}
+  },
+  "danglingRefs": []
+}

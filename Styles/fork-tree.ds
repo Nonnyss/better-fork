@@ -1,0 +1,65 @@
+// Claude orange marks the current session's row and the menu's selection bar.
+// Periwinkle is Claude Code's "suggestion" colour, for working sessions only.
+primary:   boldness(color(#D77757))
+secondary: boldness(color(#B1B9F9))
+// Zinc: terminal greys read slightly cool.
+neutral:   boldness(color(oklch(55.2%, 0.016, 285.938)))
+
+// Inside the pane everything is the mono face. Manrope is only for
+// documentation around the pane, never inside it.
+font.family:      "JetBrains Mono"
+font.family.mono: "JetBrains Mono"
+font.family.sans: Manrope
+
+// Claude Code's own status hues.
+color.warning: amber.mid
+color.success: green.mid
+color.error:   rose.mid
+
+// Session status, one role per Status in hooks/look.ts (LOOK). Change both together.
+//   blocked ?   working ●   failed ✗   idle ○   done ✓   stopped ■   gone ·
+color.status.blocked: amber.mid
+color.status.working: secondary.mid
+color.status.failed:  rose.mid
+color.status.done:    green.mid
+color.status.idle:    neutral.strong
+color.status.stopped: neutral.soft
+color.status.gone:    neutral.soft
+
+// Tree chrome: indent guides, carets, "+N" fold counts and the "⋯ age" column
+// are terminal dimColor. Done/stopped/gone labels use it too.
+color.tree.dim:      neutral.soft
+color.tree.label:    neutral.strong
+
+// Keyboard selection is terminal inverse: the label swaps ink and paper.
+color.selection:     neutral.strong
+color.on-selection:  neutral.hint
+
+// The current session: a full-width Claude-orange bar, white bold text.
+color.current:       primary.mid
+color.on-current:    neutral.50
+
+// The ⋯ menu is a DOS-era context menu. Its colours are frozen on purpose
+// (bare hex, no mode flip): silver face, black ink, grey key hints,
+// dithered ░ shadow, Claude-orange selection bar.
+color.menu.face:     #C0C0C0
+color.menu.ink:      #000000
+color.menu.hint:     #505050
+color.menu.shadow:   #6A6A6A
+color.menu.bar:      primary.mid
+color.on-menu.bar:   neutral.50
+
+// One terminal row: 14px mono, line height 1.25.
+typography.row:     { fontSize: font.size.sm, fontWeight: font.weight.soft, lineHeight: font.lineHeight.tight, fontFamily: font.family.mono }
+typography.row.current: { fontSize: font.size.sm, fontWeight: font.weight.bold, lineHeight: font.lineHeight.tight, fontFamily: font.family.mono }
+// Documentation voice around the pane.
+typography.doc.title:   { fontSize: font.size.2xl, fontWeight: font.weight.bold, lineHeight: 1.2, fontFamily: font.family.sans }
+typography.doc.section: { fontSize: font.size.lg,  fontWeight: font.weight.firm, lineHeight: 1.3, fontFamily: font.family.sans }
+typography.doc.body:    { fontSize: font.size.sm,  fontWeight: font.weight.soft, lineHeight: font.lineHeight.normal, fontFamily: font.family.sans }
+typography.doc.label:   { fontSize: font.size.xs,  fontWeight: font.weight.mid,  lineHeight: 1.4, fontFamily: font.family.sans }
+
+pin: primary, secondary,
+     color.status.blocked, color.status.working, color.status.failed,
+     color.status.done, color.status.idle, color.status.stopped,
+     color.current, color.selection, color.tree.dim, color.tree.label,
+     color.menu.face, color.menu.bar

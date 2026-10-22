@@ -1,0 +1,5 @@
+      e354a56f8d1ecf8a fr comp p(0,0) s(hug:124,hug:90.5) f[] "Swatch"
+        271bfa3317ca9c78 al(v,g(4:$spacing.xs),pad(0:$spacing.none)) mref(271bfa3317ca9c78) p(0,0) s(124,hug:90.5) f[] "Frame 1"
+          7ff521e335cca2d0 r mref(7ff521e335cca2d0) p(0,0) s(fill,48) ext(124,) f[(3932b09f6b4804f8,tok(color.status.working,#B1B9F9))] st[(ad78a23cddb22185,tok(color.outline.variant,#43434A),w(1:$stroke.width.subtle))] "Rectangle 1"
+          434a28726164f90c t("● working",JetBrains Mono,14,r,align(l),lh(1.25)) mref(434a28726164f90c) p(0,52) s(hug:75.61,hug:17.5) f[(a85c7a8fd4ec73c0,tok(color.text.primary,#E0E0E2))] $typography.row "Text 4"
+          b1f4285b28229a1e t("color.status.working",Manrope,12,m,align(l),lh(1.4)) mref(b1f4285b28229a1e) p(0,73.5) s(fill,hug:17) ext(124,) f[(93b74337cf783044,tok(color.text.secondary,#C5C5C9))] $typography.doc.label "Text 5"
