@@ -1,0 +1,15 @@
+{
+  "name": "better-fork",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "typecheck": "tsc -p better-fork",
+    "test": "claude plugin test better-fork"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  }
+}
