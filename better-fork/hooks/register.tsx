@@ -144,9 +144,7 @@ export const register: Register = on => {
     const list = await read($, rows)
     const width = e.props.bodyColumns
     const count = (s: Status) => list.filter(r => r.status === s).length
-    const pick = (value: Filter, label: string) => (
-      <Button key={`filter:${value}`} plain label={label} dimColor={filter !== value} onPress={() => void setFilter($, value)} />
-    )
+    const pick = (value: Filter, label: string) => <Button key={`filter:${value}`} plain label={label} dimColor={filter !== value} onPress={() => void setFilter($, value)} />
     const header = (
       <Box flexDirection="column">
         <Box flexDirection="row">
@@ -156,7 +154,7 @@ export const register: Register = on => {
         </Box>
         <Text>
           <Text color="warning">? {count('blocked')} need you</Text>
-          <Text dimColor>  </Text>
+          <Text dimColor>{'  '}</Text>
           <Text color="suggestion">● {count('working')} working</Text>
         </Text>
       </Box>

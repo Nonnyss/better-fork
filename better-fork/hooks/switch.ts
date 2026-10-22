@@ -45,9 +45,8 @@ async function focusTab($: EngineInterface, pid: number): Promise<boolean> {
   return r.stdout.trim() === 'ok'
 }
 
-const newTabCommand = (target: Target) => target.isBg
-  ? `claude attach ${target.short ?? target.sessionId.slice(0, 8)}`
-  : `${target.cwd ? `cd ${quote(target.cwd)} && ` : ''}claude --resume ${target.sessionId}`
+const newTabCommand = (target: Target) =>
+  target.isBg ? `claude attach ${target.short ?? target.sessionId.slice(0, 8)}` : `${target.cwd ? `cd ${quote(target.cwd)} && ` : ''}claude --resume ${target.sessionId}`
 
 export async function openInNewTab($: EngineInterface, target: Target) {
   if (target.pid && (await focusTab($, target.pid))) return

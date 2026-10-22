@@ -7,7 +7,11 @@ const JOB_STATUS: Record<string, Status> = { blocked: 'blocked', working: 'worki
 const LIVE_STATUS: Record<string, Status> = { busy: 'working', waiting: 'blocked' }
 
 async function readJson($: EngineInterface, path: string): Promise<any> {
-  try { return JSON.parse((await $.fs.read(path)) as string) } catch { return undefined }
+  try {
+    return JSON.parse((await $.fs.read(path)) as string)
+  } catch {
+    return undefined
+  }
 }
 
 // Parsed files by path with the mtime they were read at: a rescan reads only what changed.
@@ -29,12 +33,14 @@ export async function readSessions($: EngineInterface, home: string): Promise<Se
   // Fleet jobs: what the background-sessions view lists. A folder's listing carries no mtime of its file, so each is stat'ed.
   const jobsDir = `${home}/.claude/jobs`
   const dirs = (await $.fs.list(jobsDir).catch(() => [])).filter(d => d.kind === 'dir')
-  const jobs = await Promise.all(dirs.map(async d => {
-    const path = `${jobsDir}/${d.name}/state.json`
-    seen.add(path)
-    const stat = await $.fs.stat(path).catch(() => undefined)
-    return stat ? readChanged($, path, stat.mtimeMs) : undefined
-  }))
+  const jobs = await Promise.all(
+    dirs.map(async d => {
+      const path = `${jobsDir}/${d.name}/state.json`
+      seen.add(path)
+      const stat = await $.fs.stat(path).catch(() => undefined)
+      return stat ? readChanged($, path, stat.mtimeMs) : undefined
+    }),
+  )
   for (const j of jobs) {
     if (!j?.sessionId) continue
     byId.set(j.sessionId, {
@@ -50,11 +56,13 @@ export async function readSessions($: EngineInterface, home: string): Promise<Se
   // Live sessions, named <pid>.json, including interactive ones the fleet never saw.
   const liveDir = `${home}/.claude/sessions`
   const files = (await $.fs.list(liveDir).catch(() => [])).filter(f => f.name.endsWith('.json'))
-  const lives = await Promise.all(files.map(f => {
-    const path = `${liveDir}/${f.name}`
-    seen.add(path)
-    return readChanged($, path, f.mtimeMs)
-  }))
+  const lives = await Promise.all(
+    files.map(f => {
+      const path = `${liveDir}/${f.name}`
+      seen.add(path)
+      return readChanged($, path, f.mtimeMs)
+    }),
+  )
   for (const s of lives) {
     if (!s?.sessionId) continue
     const job = byId.get(s.sessionId)

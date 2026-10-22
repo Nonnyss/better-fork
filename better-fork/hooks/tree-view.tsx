@@ -90,7 +90,7 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
       const hit = ITEMS.findIndex(i => i.keys.includes(e.key.toLowerCase()))
       return hit >= 0 ? choose(hit) : set({ menu: undefined, item: undefined })
     }
-    const rowAt = (i: number) => all[i]?.kind === 'row' ? all[i]!.row : undefined
+    const rowAt = (i: number) => (all[i]?.kind === 'row' ? all[i]!.row : undefined)
     const sel = Math.min(state.sel ?? 0, all.length - 1)
     const row = rowAt(sel)
     if (e.key === 'up' || e.key === 'down') {
@@ -110,10 +110,25 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
     const pad = <Text>{' '.repeat(line.x)}</Text>
     const shade = <Text color={SHADOW}>░</Text>
     if (line.part === 'gap') return <Text> </Text>
-    if (line.part === 'shadow') return <Box flexDirection="row">{pad}<Text> </Text><Text color={SHADOW}>{'░'.repeat(BOX - 1)}</Text></Box>
+    if (line.part === 'shadow')
+      return (
+        <Box flexDirection="row">
+          {pad}
+          <Text> </Text>
+          <Text color={SHADOW}>{'░'.repeat(BOX - 1)}</Text>
+        </Box>
+      )
     if (line.part !== 'item') {
       const [l, r] = line.part === 'top' ? ['┌', '┐'] : ['└', '┘']
-      return <Box flexDirection="row">{pad}<Text backgroundColor={FACE} color="black">{l + '─'.repeat(INNER) + r}</Text>{line.part === 'top' ? <Text> </Text> : shade}</Box>
+      return (
+        <Box flexDirection="row">
+          {pad}
+          <Text backgroundColor={FACE} color="black">
+            {l + '─'.repeat(INNER) + r}
+          </Text>
+          {line.part === 'top' ? <Text> </Text> : shade}
+        </Box>
+      )
     }
     const it = ITEMS[line.item]!
     const on = (state.item ?? 0) === line.item
@@ -125,10 +140,11 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
           │
           <Text backgroundColor={bg} color={fg}>
             {'  ' + it.label.slice(0, it.accel)}
-            <Text underline bold>{it.label[it.accel]}</Text>
+            <Text underline bold>
+              {it.label[it.accel]}
+            </Text>
             {it.label.slice(it.accel + 1).padEnd(LABEL - it.accel - 1) + '  '}
-            <Text color={on ? 'white' : HINT}>{it.key}</Text>
-            {' '}
+            <Text color={on ? 'white' : HINT}>{it.key}</Text>{' '}
           </Text>
           │
         </Text>
@@ -149,17 +165,24 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
           // One Text padded to the full width, so the bar runs across the row, not just under the label.
           const left = `${lead}${caret}${look.glyph} ${label}${tail}`
           const gap = Math.max(1, width - cells(left) - cells(right))
-          return <Text backgroundColor="claude" color="white" bold>{left + ' '.repeat(gap) + right}</Text>
+          return (
+            <Text backgroundColor="claude" color="white" bold>
+              {left + ' '.repeat(gap) + right}
+            </Text>
+          )
         }
         return (
           <Box flexDirection="row">
             <Text dimColor>{lead}</Text>
             <Text dimColor={r.below === 0}>{caret}</Text>
-            {!isOlder && <Text color={look.color} dimColor={look.dim}>{look.glyph} </Text>}
-            <Text
-              dimColor={!isSel && (isOlder || r.status === 'done' || look.dim)}
-              inverse={isSel}
-            >{label}</Text>
+            {!isOlder && (
+              <Text color={look.color} dimColor={look.dim}>
+                {look.glyph}{' '}
+              </Text>
+            )}
+            <Text dimColor={!isSel && (isOlder || r.status === 'done' || look.dim)} inverse={isSel}>
+              {label}
+            </Text>
             <Text dimColor>{tail}</Text>
             <Box flexGrow={1} />
             <Text dimColor>{right}</Text>

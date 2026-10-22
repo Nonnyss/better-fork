@@ -22,8 +22,7 @@ type Node = Session & { id: string; lineage?: string; slug: string; kids: Node[]
 // Which status a merged row shows: the one that most wants attention.
 const RANK: Record<Status, number> = { blocked: 0, working: 1, failed: 2, idle: 3, done: 4, stopped: 5, gone: 6 }
 // Work in flight always holds its tree open; a question or an open tab only while under three days old.
-const isHot = (n: Session, now: number) =>
-  n.status === 'working' || n.status === 'failed' || ((n.status === 'blocked' || n.status === 'idle') && now - n.updatedAt < 3 * DAY)
+const isHot = (n: Session, now: number) => n.status === 'working' || n.status === 'failed' || ((n.status === 'blocked' || n.status === 'idle') && now - n.updatedAt < 3 * DAY)
 
 const lineageOf = (name = '') => name.match(LINEAGE)?.[1]
 
@@ -92,7 +91,10 @@ export function treeRows(sessions: Session[], currentId: string, now: number, fo
   const roots: Node[] = []
   const up = new Map<Node, Node>()
   // A parent link that loops back to n would hide the whole loop, so n becomes a root.
-  const loops = (n: Node, p: Node) => { for (let a: Node | undefined = p; a; a = up.get(a)) if (a === n) return true; return false }
+  const loops = (n: Node, p: Node) => {
+    for (let a: Node | undefined = p; a; a = up.get(a)) if (a === n) return true
+    return false
+  }
   function attach(n: Node) {
     let parent = n.parentId ? byId.get(n.parentId) : undefined
     if (parent && loops(n, parent)) parent = undefined
@@ -124,9 +126,16 @@ export function treeRows(sessions: Session[], currentId: string, now: number, fo
     drawn.add(n)
     const folded = n.kids.length > 0 && isFolded(n)
     rows.push({
-      id: n.id, indent, connector, status: n.status, label: labelOf(n),
-      age: n.updatedAt ? age(n.updatedAt, now) : '', isCurrent: n.ids.has(currentId),
-      below: n.size, isFolded: folded, target: n.target,
+      id: n.id,
+      indent,
+      connector,
+      status: n.status,
+      label: labelOf(n),
+      age: n.updatedAt ? age(n.updatedAt, now) : '',
+      isCurrent: n.ids.has(currentId),
+      below: n.size,
+      isFolded: folded,
+      target: n.target,
     })
     if (folded) return
     const kids = [...n.kids].sort((a, b) => step(a) - step(b) || a.updatedAt - b.updatedAt)

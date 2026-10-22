@@ -19,7 +19,14 @@ const json = (v: unknown) => JSON.stringify(v)
  */
 const DISK: Record<string, string> = {
   '/h/.claude/jobs/a/state.json': json({ sessionId: 'a', name: '#182-nipa-ai-worker-codebase', state: 'done', cwd: '/repo', updatedAt: at(2), daemonShort: 'a' }),
-  '/h/.claude/jobs/b/state.json': json({ sessionId: 'b', name: '#182⑂1-a-very-long-session-name-that-will-not-fit-at-all', state: 'blocked', cwd: '/repo', forkParentSessionId: 'a', updatedAt: at(1) }),
+  '/h/.claude/jobs/b/state.json': json({
+    sessionId: 'b',
+    name: '#182⑂1-a-very-long-session-name-that-will-not-fit-at-all',
+    state: 'blocked',
+    cwd: '/repo',
+    forkParentSessionId: 'a',
+    updatedAt: at(1),
+  }),
   '/h/.claude/sessions/42.json': json({ sessionId: 'me', pid: 42, kind: 'interactive', status: 'busy', cwd: '/repo', name: '#186-better-fork-sidebar-tree', updatedAt: NOW }),
   '/h/.claude/sessions/77.json': json({ sessionId: 'bg1', pid: 77, kind: 'bg', status: 'idle', cwd: '/repo', jobId: 'bg1short', name: '#190-idle-background', updatedAt: NOW - 5000 }),
   '/h/.claude/sessions/78.json': json({ sessionId: 'bg2', pid: 78, kind: 'bg', status: 'idle', cwd: '/other', jobId: 'bg2short', name: '#191-other-project', updatedAt: NOW - 6000 }),
@@ -43,7 +50,11 @@ async function start($: Engine, on: On, resumeText = '', extra: Record<string, s
   on('fs.list', (_, e) => {
     if (e.path.endsWith('/hooks')) return { value: [{ name: 'register.tsx', kind: 'file', size: 1, mtimeMs: mod.mtimeMs, isLink: false }] }
     const dir = `${e.path}/`
-    const names = new Set(Object.keys(disk).filter(p => p.startsWith(dir)).map(p => p.slice(dir.length).split('/')[0]!))
+    const names = new Set(
+      Object.keys(disk)
+        .filter(p => p.startsWith(dir))
+        .map(p => p.slice(dir.length).split('/')[0]!),
+    )
     return { value: [...names].map(name => ({ name, kind: name.endsWith('.json') ? 'file' : 'dir', size: 1, mtimeMs: 1, isLink: false })) }
   })
   const reads: string[] = []
@@ -229,7 +240,6 @@ test('the filter narrows the tree to this project and back to all', async ($, on
   expect(await ui.find({ type: 'Text', text: /other-project/, in: 'tree' })).toBeDefined()
   await ui.unmount()
 })
-
 
 test('the ⋯ menu runs the item clicked: a frame line above, then open here, new tab, copy id', async ($, on) => {
   const { ran } = await start($, on)
