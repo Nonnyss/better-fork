@@ -152,6 +152,17 @@ test('this project is the first tab and the default; the header counts what need
   await ui.unmount()
 })
 
+test('a job resumed in a tab shows the tab, not the question the job file still holds', async ($, on) => {
+  await start($, on, '', {
+    '/h/.claude/jobs/c/state.json': json({ sessionId: 'c', name: '#187-resumed', state: 'blocked', tempo: 'blocked', needs: 'reconnect', cwd: '/repo', updatedAt: at(3) }),
+    '/h/.claude/sessions/50.json': json({ sessionId: 'c', pid: 50, kind: 'interactive', status: 'idle', cwd: '/repo', name: '#187-resumed', updatedAt: NOW - 7000 }),
+  })
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect((await ui.find({ type: 'Text', text: /need you/ }))?.text).toBe('✻ 1 need you  ✻ 1 working  • 1 done')
+  expect(await ui.find({ type: 'Text', text: /reconnect/, ...tree })).toBeUndefined()
+  await ui.unmount()
+})
+
 test('the tree folds on its caret and opens a row menu from its ⋯', async ($, on) => {
   await start($, on)
 

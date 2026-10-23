@@ -80,12 +80,15 @@ export async function readSessions($: EngineInterface, home: string, withJobs = 
     if (!s?.sessionId) continue
     const job = byId.get(s.sessionId)
     const isBg = s.kind === 'bg'
+    // A tab that resumed an old job owns it now: the job file's question and status are stale. A bg job
+    // still waiting on its question reports `idle` here, so only bg falls back to the job.
+    const status = LIVE_STATUS[s.status] ?? (isBg ? job?.status : undefined) ?? 'idle'
     byId.set(s.sessionId, {
       sessionId: s.sessionId,
       name: s.name ?? job?.name,
       intent: job?.intent,
-      status: LIVE_STATUS[s.status] ?? job?.status ?? 'idle',
-      needs: job?.needs,
+      status,
+      needs: status === 'blocked' ? job?.needs : undefined,
       parentId: job?.parentId,
       updatedAt: Math.max(s.updatedAt ?? 0, job?.updatedAt ?? 0),
       target: { sessionId: s.sessionId, cwd: s.cwd, isBg, isLive: true, short: s.jobId ?? job?.target?.short, pid: isBg ? undefined : s.pid },
