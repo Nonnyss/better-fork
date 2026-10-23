@@ -4,7 +4,9 @@
 
 **Every Claude Code session you've started, as one tree beside your chat.**
 
-<img src="docs/images/pane.png" alt="The better-fork pane: project and all tabs, 3 sessions need you and 2 are working, starred sessions pinned on top, the current session on an orange bar, and a key bar at the foot" width="460">
+<img src="docs/images/terminal.png" alt="better-fork docked on the right of a Claude Code session in iTerm2: 29 sessions need you, 2 are working, starred sessions on top, today's and earlier trees with their forks, the current session on an orange bar, and the key bar at the foot">
+
+<sub>Docked beside a live session in iTerm2: every fork under its parent, 29 sessions waiting on you, 2 working.</sub>
 
 [Features](#features) · [Install](#install) · [Mouse](#mouse) · [How it works](#how-it-works) · [Design](#design) · [Development](#development)
 
@@ -13,10 +15,6 @@
 <br>
 
 Fork a session a few times and `/resume` turns into a flat list of look-alike names. better-fork draws them the way you made them: each fork under the session it came from, with a live mark for what it is doing. Interactive tabs, background jobs and closed transcripts all sit in one pane, and any of them is one click away.
-
-<p align="center">
-  <img src="docs/images/terminal.png" alt="better-fork docked on the right of a Claude Code session in iTerm2: 29 sessions need you, 2 are working, starred sessions on top, today's and earlier trees with their forks, the current session on an orange bar, and the key bar at the foot">
-</p>
 
 ## Features
 
@@ -27,6 +25,10 @@ Fork a session a few times and `/resume` turns into a flat list of look-alike na
 ```
 
 The marks are the same ones Claude Code uses in its own tabs. Working sessions spin; the rest stay still. The header counts what needs you and what is working, and the selected row spells out the question it is waiting on.
+
+<p align="center">
+  <img src="docs/images/pane.png" alt="The better-fork pane: project and all tabs, 3 sessions need you and 2 are working, starred sessions pinned on top, the current session on an orange bar, and a key bar at the foot" width="460">
+</p>
 
 When a session asks something or finishes a turn, a toast says so, never for the session you are already in. Several at once fold into one line. A question stays for fifteen seconds; the rest leave after six.
 
