@@ -23,6 +23,11 @@ const all = atom({ plugin: 'better-fork', key: 'all' } as const, [] as Row[])
 const opening = atom({ plugin: 'better-fork', key: 'opening' } as const, null as Opening | null)
 // What the header's search field holds; the tree filters on it.
 const query = atom({ plugin: 'better-fork', key: 'query' } as const, '')
+// The tree's first shown line. The pane itself never scrolls: a scrolled body moved the key bar with it,
+// and it jumped back only on the next draw, a flicker on every wheel tick.
+const top = atom({ plugin: 'better-fork', key: 'top' } as const, 0)
+// How far the tree can scroll, as last drawn: the wheel stops there.
+let lastTop = 0
 
 let timer: { cancel: () => void } | undefined
 let last = ''
@@ -104,6 +109,7 @@ async function save($: EngineInterface, key: string, value: unknown) {
 
 async function setFilter($: EngineInterface, next: Filter) {
   filter = next
+  await update($, top, () => 0)
   await save($, 'filter', filter)
 }
 
@@ -252,6 +258,11 @@ export const register: Register = on => {
     return { text: 'better-fork opened.' }
   })
 
+  on('ui.scroll', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    await update($, top, t => Math.max(0, Math.min(lastTop, t + e.by)))
+    return { deny: 'better-fork scrolls its tree itself' }
+  })
+
   on('ui.message', async ($, e, next) => {
     if (e.requestId !== PANE) return next(e)
     const data = e.data as { act?: Act; id?: string; text?: string }
@@ -286,9 +297,14 @@ export const register: Register = on => {
     const rule = <Text color={GUIDE}>{'─'.repeat(width)}</Text>
     const ruleBelow = !list[0]?.isRule
     const headerRows = 4 + (ruleBelow ? 1 : 0) + (list.length === 0 ? 1 : 0)
+    // The pane draws exactly its body's rows, so the engine has nothing to scroll and the bar stays put.
+    const treeRows = Math.max(3, e.props.scroll.bodyRows - headerRows)
+    // A row may carry a question or a step line under it: one spare line each way keeps the end reachable.
+    lastTop = Math.max(0, (q ? whole.length : list.length) + 1 - (treeRows - 2))
     const header = (
       <Box flexDirection="column">
-        <Box flexDirection="row">
+        {/* One line whatever the width: headerRows counts on it, and a wrapped row pushed the key bar off the pane. */}
+        <Box flexDirection="row" height={1} overflow="hidden">
           {tab('project', 'project')}
           {tab('all', 'all')}
           <Box flexGrow={1} />
@@ -301,7 +317,14 @@ export const register: Register = on => {
               <Text dimColor hover={{ dimColor: false }}>
                 {' / '}
               </Text>
-              <Input key="query" placeholder="find" submitLabel="open" value={q} onInput={(v: string) => void update($, query, () => v)} onSubmit={(v: string) => void openFirst($, v)} />
+              <Input
+                key="query"
+                placeholder="find"
+                submitLabel="open"
+                value={q}
+                onInput={(v: string) => void update($, query, () => v).then(() => update($, top, () => 0))}
+                onSubmit={(v: string) => void openFirst($, v)}
+              />
               <Text> </Text>
             </Box>
           )}
@@ -338,7 +361,7 @@ export const register: Register = on => {
         <Client
           key="tree"
           module="./tree-view.tsx"
-          props={{ rows: list, all: whole, width, opening: await read($, opening), query: await read($, query), bottom: e.props.scroll.offset + e.props.scroll.bodyRows - headerRows, home }}
+          props={{ rows: list, all: whole, width, opening: await read($, opening), query: q, window: { top: Math.min(await read($, top), lastTop), rows: treeRows }, home }}
         />
       </Box>
     )

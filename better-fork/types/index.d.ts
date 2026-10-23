@@ -33,6 +33,6 @@ export type Opening = { id: string; step: string }
 
 declare module 'claude-code' {
   interface PluginState {
-    'better-fork': { rows: Row[]; all: Row[]; opening: Opening | null; query: string }
+    'better-fork': { rows: Row[]; all: Row[]; opening: Opening | null; query: string; top: number }
   }
 }

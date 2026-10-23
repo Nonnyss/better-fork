@@ -4,11 +4,11 @@ import type { Opening, Row } from '../types'
 import { GUIDE, HIDDEN_ID, LOOK, OLDER_ID, SPIN, SPIN_MS, cells, clip, dotX, fullLabel, layout } from './look'
 
 /**
- * `query` is what the header's search field holds: the tree filters while it is not empty. `bottom` is the
- * tree's row just past the pane's window, where the key bar ends: the pane scrolls its whole body, so the
- * bar follows the window rather than the tree's end.
+ * `query` is what the header's search field holds: the tree filters while it is not empty. `window` is the
+ * pane's room for the tree and the first line it shows: the pane never scrolls (register.tsx answers the
+ * wheel), so the tree draws only what fits and the key bar is a plain last line.
  */
-export type ViewProps = { rows: Row[]; all: Row[]; width: number; opening: Opening | null; query: string; bottom?: number; home?: string }
+export type ViewProps = { rows: Row[]; all: Row[]; width: number; opening: Opening | null; query: string; window?: { top: number; rows: number }; home?: string }
 export type Act = 'here' | 'tab' | 'copy' | 'fold' | 'star' | 'hide' | 'rename' | 'delete' | 'eye' | 'find'
 type State = {
   /** Row id the ⋯ menu is open on, and the item lit in it. */
@@ -208,16 +208,13 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
   const { Box, Text } = surface.elements
   const state = shown?.surface === surface ? shown.state : (surface.state ?? {})
   const width = surface.columns || props.width
-  const body = build(props, state, width)
-  // The key bar ends on the window's last row: blank rows push it down under a short tree; over a long one it
-  // floats (absolute), and two spare rows at the tree's end let its last rows scroll clear of it.
-  const bottom = props.bottom ?? body.length + 2
-  const floats = body.length + 2 > bottom
-  const blanks = (n: number): Line[] => Array.from({ length: Math.max(1, n) }, () => ({ kind: 'blank' }))
-  const all: Line[] = floats ? [...body, ...blanks(2)] : [...body, ...blanks(bottom - body.length - 1), { kind: 'keys' }]
-  const keysAt = floats ? bottom - 1 : all.length - 1
+  const all = build(props, state, width)
+  // The lines that fit above a blank line and the key bar; scrolled no further than the last of them shows.
+  const visible = Math.max(1, (props.window?.rows ?? all.length + 2) - 2)
+  const start = Math.max(0, Math.min(props.window?.top ?? 0, all.length - visible))
+  const keysAt = visible + 1
   const mode = state.confirm ? 'confirm' : state.edit ? 'edit' : state.menu !== undefined ? 'menu' : props.query ? 'search' : 'tree'
-  const animate = !!props.opening || all.some(l => l.kind === 'row' && l.row.status === 'working')
+  const animate = !!props.opening || all.slice(start, start + visible).some(l => l.kind === 'row' && l.row.status === 'working')
   shown = { surface, state, animate }
   const set = (next: State) => {
     const merged = { ...shown!.state, ...next }
@@ -281,7 +278,9 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
   }
 
   surface.onPointer(e => {
-    const line: Line | undefined = e.y === keysAt ? { kind: 'keys' } : floats && e.y === keysAt - 1 ? { kind: 'blank' } : all[e.y]
+    // Lines are indexed in the whole tree, the window showing them from `start`.
+    const at = e.y < visible ? start + e.y : -1
+    const line: Line | undefined = e.y === keysAt ? { kind: 'keys' } : all[at]
     // Hover redraws only when the pointer crosses into another line: a redraw per move stuttered.
     // The pointer going back to the chat closes a menu: no key ever tells the tree it lost the keyboard.
     if (e.type === 'leave') {
@@ -293,7 +292,7 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
         if (line.part === 'item' && state.item !== line.item) set({ item: line.item })
         return
       }
-      const hover = line?.kind === 'row' ? e.y : undefined
+      const hover = line?.kind === 'row' ? at : undefined
       if (state.hover !== hover) set({ hover })
       return
     }
@@ -619,66 +618,66 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
     </Box>
   )
 
+  const lineOf = (line: Line, i: number) => {
+    if (line.kind === 'menu') return menuLine(line)
+    if (line.kind === 'dialog') return dialogLine(line)
+    if (line.kind === 'row') return rowLine(line, i)
+    if (line.kind === 'rule') {
+      const text = line.row.label ? `─ ${line.row.label} ` : ''
+      const star = line.row.label.startsWith('★')
+      return (
+        <Text color={GUIDE} wrap="truncate">
+          {star ? '─ ' : text}
+          {star && <Text color="claude">★</Text>}
+          {star && <Text dimColor>{line.row.label.slice(1) + ' '}</Text>}
+          {'─'.repeat(Math.max(0, width - 6 - cells(text)))}
+        </Text>
+      )
+    }
+    if (line.kind === 'needs')
+      return (
+        <Text color="warning" dimColor italic wrap="truncate">
+          {under(line.row)}╰ {clip(line.row.needs ?? '', width - cells(under(line.row)) - 2)}
+        </Text>
+      )
+    if (line.kind === 'opening')
+      return (
+        <Text color="claude" italic wrap="truncate">
+          {under(line.row)}╰ {clip(`${line.step}…`, width - cells(under(line.row)) - 2)}
+        </Text>
+      )
+    if (line.kind === 'editHint') {
+      const step = stepOf(line.row)
+      return (
+        <Text dimColor wrap="truncate">
+          {under(line.row)}
+          <Text bold>{SAVE.slice(0, 1)}</Text>
+          {SAVE.slice(1) + GAP}
+          <Text bold>{CANCEL.slice(0, 3)}</Text>
+          {CANCEL.slice(3)}
+          {step && `${GAP}${step} is kept`}
+        </Text>
+      )
+    }
+    if (line.kind === 'search') {
+      return (
+        <Text dimColor wrap="truncate">
+          {`${line.matches} of ${line.total} match`}
+        </Text>
+      )
+    }
+    if (line.kind === 'blank') return <Text> </Text>
+    return keysLine
+  }
+
+  const shownLines = all.slice(start, start + visible)
   return (
     <Box flexDirection="column">
-      {all.map((line, i) => {
-        if (line.kind === 'menu') return menuLine(line)
-        if (line.kind === 'dialog') return dialogLine(line)
-        if (line.kind === 'row') return rowLine(line, i)
-        if (line.kind === 'rule') {
-          const text = line.row.label ? `─ ${line.row.label} ` : ''
-          const star = line.row.label.startsWith('★')
-          return (
-            <Text color={GUIDE} wrap="truncate">
-              {star ? '─ ' : text}
-              {star && <Text color="claude">★</Text>}
-              {star && <Text dimColor>{line.row.label.slice(1) + ' '}</Text>}
-              {'─'.repeat(Math.max(0, width - 6 - cells(text)))}
-            </Text>
-          )
-        }
-        if (line.kind === 'needs')
-          return (
-            <Text color="warning" dimColor italic wrap="truncate">
-              {under(line.row)}╰ {clip(line.row.needs ?? '', width - cells(under(line.row)) - 2)}
-            </Text>
-          )
-        if (line.kind === 'opening')
-          return (
-            <Text color="claude" italic wrap="truncate">
-              {under(line.row)}╰ {clip(`${line.step}…`, width - cells(under(line.row)) - 2)}
-            </Text>
-          )
-        if (line.kind === 'editHint') {
-          const step = stepOf(line.row)
-          return (
-            <Text dimColor wrap="truncate">
-              {under(line.row)}
-              <Text bold>{SAVE.slice(0, 1)}</Text>
-              {SAVE.slice(1) + GAP}
-              <Text bold>{CANCEL.slice(0, 3)}</Text>
-              {CANCEL.slice(3)}
-              {step && `${GAP}${step} is kept`}
-            </Text>
-          )
-        }
-        if (line.kind === 'search') {
-          return (
-            <Text dimColor wrap="truncate">
-              {`${line.matches} of ${line.total} match`}
-            </Text>
-          )
-        }
-        if (line.kind === 'blank') return <Text> </Text>
-        return keysLine
-      })}
-      {floats && (
-        <Box position="absolute" top={keysAt - 1} left={0} flexDirection="column">
-          {/* Spaces, not an empty Box: they paint over the rows the bar floats on. */}
-          <Text>{' '.repeat(width)}</Text>
-          {keysLine}
-        </Box>
-      )}
+      {shownLines.map((line, k) => lineOf(line, start + k))}
+      {Array.from({ length: visible - shownLines.length + 1 }, () => (
+        <Text> </Text>
+      ))}
+      {keysLine}
     </Box>
   )
 }

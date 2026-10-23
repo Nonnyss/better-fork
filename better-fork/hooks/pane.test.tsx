@@ -324,8 +324,8 @@ test('hide takes a session out of the tree and the counts; the eye brings it bac
   await ui.unmount()
 })
 
-test("the key bar stays on the pane's last row: pushed down under a short tree, floating over a long one as it scrolls", async ($, on) => {
-  await start($, on)
+test("the key bar stays on the pane's last row: pushed down under a short tree, the tree scrolling inside its window above it", async ($, on) => {
+  const { resumed } = await start($, on)
   // 30 rows less a header of 5 (tabs, rule, project, counts, rule): the bar on the tree's row 24.
   const short = await $.ui.mount({ ...PANE, surface: 'terminal' })
   const drawn = await lines(short)
@@ -333,13 +333,17 @@ test("the key bar stays on the pane's last row: pushed down under a short tree, 
   expect(drawn.at(-1)).toMatch(/^⏎ open/)
   await short.unmount()
 
-  // 8 rows: 3 for the tree, fewer than its 4 rows. The bar floats on the window's last row and follows a scroll.
-  const window = (offset: number) => ({ ...PANE.props, scroll: { offset, bodyRows: 8 } })
-  const long = await $.ui.mount({ ...PANE, props: window(0), surface: 'terminal' })
-  const bar = async () => (await long.findAll({ type: 'Box', text: /open/, ...tree })).find(b => b.props.position === 'absolute')?.props
-  expect(await bar()).toMatchObject({ position: 'absolute', top: 1 })
-  await long.redraw(window(2))
-  expect(await bar()).toMatchObject({ position: 'absolute', top: 3 })
+  // 8 rows less the header: 3 for the tree, one line of it above the blank and the bar. A wheel tick scrolls
+  // the tree inside its window and leaves the pane, so the bar never moves.
+  const long = await $.ui.mount({ ...PANE, props: { ...PANE.props, scroll: { offset: 0, bodyRows: 8 } }, surface: 'terminal' })
+  expect(await lines(long)).toEqual([expect.stringMatching(/#186/), ' ', expect.stringMatching(/^⏎ open/)])
+  // Three wheel ticks down, as the engine raises them over the pane.
+  const moved = await $.ui.scroll({ component: 'Pane', requestId: 'better-fork', offset: 3, by: 3, bodyRows: 8, contentRows: 8, origin: { kind: 'person' } })
+  expect(moved.deny).toBe('better-fork scrolls its tree itself')
+  expect(await lines(long)).toEqual([expect.stringMatching(/a-very-long/), ' ', expect.stringMatching(/^⏎ open/)])
+  // A click lands on the row it shows, not the tree's first.
+  await click(long, 20, 0)
+  expect(resumed).toEqual(['b'])
   await long.unmount()
 })
 
