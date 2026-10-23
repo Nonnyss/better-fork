@@ -4,7 +4,7 @@
 
 **Every Claude Code session you've started, as one tree beside your chat.**
 
-<img src="docs/images/terminal.png" alt="better-fork docked on the right of a Claude Code session in iTerm2: 29 sessions need you, 2 are working, starred sessions on top, today's and earlier trees with their forks, the current session on an orange bar, and the key bar at the foot">
+<img src="docs/images/terminal-v2.png" alt="better-fork docked on the right of a Claude Code session in iTerm2: 29 sessions need you, 2 are working, starred sessions on top, today's and earlier trees with their forks, the current session on an orange bar, and the key bar at the foot">
 
 <sub>Docked beside a live session in iTerm2: every fork under its parent, 29 sessions waiting on you, 2 working.</sub>
 
