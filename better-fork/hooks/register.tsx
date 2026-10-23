@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Register, EngineInterface } from 'claude-code'
 
 import type { Opening, Row, Status } from '../types'
-import { HIDDEN_ID, LOOK, OLDER_ID, fullLabel } from './look'
+import { GUIDE, HIDDEN_ID, LOOK, OLDER_ID, fullLabel } from './look'
 import { cannotDelete, remove, rename, renamed } from './manage'
 import { readSessions } from './sources'
 import { openHere, openInNewTab } from './switch'
@@ -281,6 +281,11 @@ export const register: Register = on => {
     )
     const project = root.split('/').pop() || 'this project'
     const q = await read($, query)
+    // Rules split the header: the tabs (what to show), the project and its counts (what is shown), then the
+    // tree, unless the tree opens on a section rule of its own.
+    const rule = <Text color={GUIDE}>{'─'.repeat(width)}</Text>
+    const ruleBelow = !list[0]?.isRule
+    const headerRows = 4 + (ruleBelow ? 1 : 0) + (list.length === 0 ? 1 : 0)
     const header = (
       <Box flexDirection="column">
         <Box flexDirection="row">
@@ -301,8 +306,9 @@ export const register: Register = on => {
             </Box>
           )}
         </Box>
+        {rule}
         <Text wrap="truncate-middle">
-          {project}
+          <Text bold>{project}</Text>
           <Text dimColor> · {tilde(root.slice(0, root.length - project.length - 1)) || '/'}</Text>
         </Text>
         <Text wrap="truncate">
@@ -318,6 +324,7 @@ export const register: Register = on => {
             {LOOK.done.glyph} {count('done')} done
           </Text>
         </Text>
+        {ruleBelow && rule}
       </Box>
     )
 
@@ -328,7 +335,11 @@ export const register: Register = on => {
       <Box flexDirection="column" paddingX={1}>
         {header}
         {list.length === 0 && <Text dimColor>No sessions yet.</Text>}
-        <Client key="tree" module="./tree-view.tsx" props={{ rows: list, all: whole, width, opening: await read($, opening), query: await read($, query), home }} />
+        <Client
+          key="tree"
+          module="./tree-view.tsx"
+          props={{ rows: list, all: whole, width, opening: await read($, opening), query: await read($, query), bottom: e.props.scroll.offset + e.props.scroll.bodyRows - headerRows, home }}
+        />
       </Box>
     )
   })

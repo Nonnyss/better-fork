@@ -1,10 +1,14 @@
 import type { ClientModule, ClientSurface, Color } from 'claude-code'
 
 import type { Opening, Row } from '../types'
-import { HIDDEN_ID, LOOK, OLDER_ID, SPIN, SPIN_MS, cells, clip, dotX, fullLabel, layout } from './look'
+import { GUIDE, HIDDEN_ID, LOOK, OLDER_ID, SPIN, SPIN_MS, cells, clip, dotX, fullLabel, layout } from './look'
 
-/** `query` is what the header's search field holds: the tree filters while it is not empty. */
-export type ViewProps = { rows: Row[]; all: Row[]; width: number; opening: Opening | null; query: string; home?: string }
+/**
+ * `query` is what the header's search field holds: the tree filters while it is not empty. `bottom` is the
+ * tree's row just past the pane's window, where the key bar ends: the pane scrolls its whole body, so the
+ * bar follows the window rather than the tree's end.
+ */
+export type ViewProps = { rows: Row[]; all: Row[]; width: number; opening: Opening | null; query: string; bottom?: number; home?: string }
 export type Act = 'here' | 'tab' | 'copy' | 'fold' | 'star' | 'hide' | 'rename' | 'delete' | 'eye' | 'find'
 type State = {
   /** Row id the ⋯ menu is open on, and the item lit in it. */
@@ -28,9 +32,7 @@ const SHADOW = '#6a6a6a'
 const RULE = '#808080'
 const DANGER = '#8b1a1a'
 const NEEDS = '#6b4a00'
-// Fixed hex from Styles/fork-tree.ds (color.tree.guide, color.tree.dim): a terminal's own dim tints differently per theme.
-// Indent guides sit a step under the caret, so the labels lead.
-const GUIDE = '#43434A'
+// color.tree.dim in Styles/fork-tree.ds, fixed hex as GUIDE is.
 const CARET = '#55555D'
 const WASH = '#3d2a23'
 
@@ -133,7 +135,6 @@ function build(props: ViewProps, state: State, width: number): Line[] {
     if (state.menu === row.id) out.push(...menuLines(row, width, props.home))
     if (state.confirm?.id === row.id) out.push(...dialogLines(row, width))
   }
-  out.push({ kind: 'blank' }, { kind: 'keys' })
   return out
 }
 
@@ -207,7 +208,14 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
   const { Box, Text } = surface.elements
   const state = shown?.surface === surface ? shown.state : (surface.state ?? {})
   const width = surface.columns || props.width
-  const all = build(props, state, width)
+  const body = build(props, state, width)
+  // The key bar ends on the window's last row: blank rows push it down under a short tree; over a long one it
+  // floats (absolute), and two spare rows at the tree's end let its last rows scroll clear of it.
+  const bottom = props.bottom ?? body.length + 2
+  const floats = body.length + 2 > bottom
+  const blanks = (n: number): Line[] => Array.from({ length: Math.max(1, n) }, () => ({ kind: 'blank' }))
+  const all: Line[] = floats ? [...body, ...blanks(2)] : [...body, ...blanks(bottom - body.length - 1), { kind: 'keys' }]
+  const keysAt = floats ? bottom - 1 : all.length - 1
   const mode = state.confirm ? 'confirm' : state.edit ? 'edit' : state.menu !== undefined ? 'menu' : props.query ? 'search' : 'tree'
   const animate = !!props.opening || all.some(l => l.kind === 'row' && l.row.status === 'working')
   shown = { surface, state, animate }
@@ -273,7 +281,7 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
   }
 
   surface.onPointer(e => {
-    const line = all[e.y]
+    const line: Line | undefined = e.y === keysAt ? { kind: 'keys' } : floats && e.y === keysAt - 1 ? { kind: 'blank' } : all[e.y]
     // Hover redraws only when the pointer crosses into another line: a redraw per move stuttered.
     // The pointer going back to the chat closes a menu: no key ever tells the tree it lost the keyboard.
     if (e.type === 'leave') {
@@ -597,6 +605,19 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
   }
 
   const under = (r: Row) => ' '.repeat(cells(layout(r, width).lead) + 1)
+  const barEnd = keyBar.length ? keyBar.at(-1)!.x + keyBar.at(-1)!.w : 0
+  const keysLine = (
+    <Box flexDirection="row">
+      {keyBar.flatMap((k, n) => [
+        ...(n ? [<Text>{roomy ? ' ' : '  '}</Text>] : []),
+        <Text bold>{k.key} </Text>,
+        <Text backgroundColor={FACE} color="black">
+          {chipPad + k.label + chipPad}
+        </Text>,
+      ])}
+      <Text>{' '.repeat(Math.max(0, width - barEnd))}</Text>
+    </Box>
+  )
 
   return (
     <Box flexDirection="column">
@@ -649,18 +670,15 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
           )
         }
         if (line.kind === 'blank') return <Text> </Text>
-        return (
-          <Box flexDirection="row">
-            {keyBar.flatMap((k, n) => [
-              ...(n ? [<Text>{roomy ? ' ' : '  '}</Text>] : []),
-              <Text bold>{k.key} </Text>,
-              <Text backgroundColor={FACE} color="black">
-                {chipPad + k.label + chipPad}
-              </Text>,
-            ])}
-          </Box>
-        )
+        return keysLine
       })}
+      {floats && (
+        <Box position="absolute" top={keysAt - 1} left={0} flexDirection="column">
+          {/* Spaces, not an empty Box: they paint over the rows the bar floats on. */}
+          <Text>{' '.repeat(width)}</Text>
+          {keysLine}
+        </Box>
+      )}
     </Box>
   )
 }

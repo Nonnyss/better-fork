@@ -18,6 +18,10 @@ export const LOOK: Record<Status, { glyph: string; color?: Color; dim?: boolean 
 export const SPIN = ['·', '✢', '✳', '✶', '✻', '✽']
 export const SPIN_MS = 120
 
+// color.tree.guide in Styles/fork-tree.ds: indent guides and rules, a step under the caret so labels lead.
+// Fixed hex: a terminal's own dim tints differently per theme.
+export const GUIDE = '#43434A'
+
 export const OLDER_ID = '__older'
 
 // Out of the tree a fork's step alone ("⑂2") says nothing: toasts, the menu and the dialog name it in full.

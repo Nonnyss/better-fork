@@ -324,14 +324,43 @@ test('hide takes a session out of the tree and the counts; the eye brings it bac
   await ui.unmount()
 })
 
+test("the key bar stays on the pane's last row: pushed down under a short tree, floating over a long one as it scrolls", async ($, on) => {
+  await start($, on)
+  // 30 rows less a header of 5 (tabs, rule, project, counts, rule): the bar on the tree's row 24.
+  const short = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  const drawn = await lines(short)
+  expect(drawn).toHaveLength(25)
+  expect(drawn.at(-1)).toMatch(/^⏎ open/)
+  await short.unmount()
+
+  // 8 rows: 3 for the tree, fewer than its 4 rows. The bar floats on the window's last row and follows a scroll.
+  const window = (offset: number) => ({ ...PANE.props, scroll: { offset, bodyRows: 8 } })
+  const long = await $.ui.mount({ ...PANE, props: window(0), surface: 'terminal' })
+  const bar = async () => (await long.findAll({ type: 'Box', text: /open/, ...tree })).find(b => b.props.position === 'absolute')?.props
+  expect(await bar()).toMatchObject({ position: 'absolute', top: 1 })
+  await long.redraw(window(2))
+  expect(await bar()).toMatchObject({ position: 'absolute', top: 3 })
+  await long.unmount()
+})
+
+test('the header rules off the tabs from what they show, and the counts from the tree', async ($, on) => {
+  await start($, on)
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+
+  expect(await ui.findAll({ type: 'Text', text: /^─{38}$/ })).toHaveLength(2)
+  // The project, /repo here, leads its line in bold.
+  expect((await ui.find({ type: 'Text', text: /^repo$/ }))?.props.bold).toBe(true)
+  await ui.unmount()
+})
+
 test('the key bar spaces each key from its chip, and pads the chips where the tree has room', async ($, on) => {
   await start($, on)
   const narrow = await $.ui.mount({ ...PANE, surface: 'terminal' })
-  expect((await lines(narrow)).at(-1)).toBe('⏎ open  t tab  / find  s star  m menu')
+  expect((await lines(narrow)).at(-1)?.trimEnd()).toBe('⏎ open  t tab  / find  s star  m menu')
   await narrow.unmount()
 
   const wide = await $.ui.mount({ ...PANE, props: { ...PANE.props, bodyColumns: 60 }, surface: 'terminal' })
-  expect((await lines(wide)).at(-1)).toBe('⏎  open  t  tab  /  find  s  star  m  menu ')
+  expect((await lines(wide)).at(-1)?.trimEnd()).toBe('⏎  open  t  tab  /  find  s  star  m  menu')
   await wide.unmount()
 })
 
