@@ -14,6 +14,10 @@
 
 Fork a session a few times and `/resume` turns into a flat list of look-alike names. better-fork draws them the way you made them: each fork under the session it came from, with a live mark for what it is doing. Interactive tabs, background jobs and closed transcripts all sit in one pane, and any of them is one click away.
 
+<p align="center">
+  <img src="docs/images/terminal.png" alt="better-fork docked on the right of a Claude Code session in iTerm2: 29 sessions need you, 2 are working, starred sessions on top, today's and earlier trees with their forks, the current session on an orange bar, and the key bar at the foot">
+</p>
+
 ## Features
 
 ### See what needs you
