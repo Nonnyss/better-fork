@@ -1,0 +1,5 @@
+        979e81ea421fcba9 fr comp axes[state[on,off]] p(0,76.8) s(180.02,58) f[] st[(0c6b867181d9f068,#7C6BF0,w(1),dash(10,5))] rd(16) "Tab"
+          fd7ad8d5d5acfa87 al(h,y(c),pad(0:$spacing.none,8:$spacing.sm,0:$spacing.none,8:$spacing.sm)) variant(state(on)) p(20,20) s(hug:74.81,18) f[(acf796320f350188,tok(color.selection,#F0F0F1))] "Frame 23"
+            f38c2423848ef6e0 t("project",JetBrains Mono,14,b,align(l),lh(1.25)) mref(f38c2423848ef6e0) p(8,0.25) s(hug:58.81,hug:17.5) f[(9818c27525f926f6,tok(color.on-selection,#28282C))] $typography.row.current "Label"
+          f92bc555439c8f09 al(h,y(c),pad(0:$spacing.none,8:$spacing.sm,0:$spacing.none,8:$spacing.sm)) variant(state(off)) p(118.81,20) s(hug:41.21,18) f[(7d0059348f5f007b,tok(color.surface,#28282C))] "Frame 24"
+            2c5d6aba108ded4f t("all",JetBrains Mono,14,r,align(l),lh(1.25)) mref(f38c2423848ef6e0) p(8,0.25) s(hug:25.21,hug:17.5) f[(cddaec3af79c46b2,tok(color.tree.dim,#55555D))] $typography.row "Label"

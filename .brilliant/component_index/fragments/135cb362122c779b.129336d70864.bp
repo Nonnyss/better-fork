@@ -1,0 +1,4 @@
+        135cb362122c779b fr comp p(0,50.8) s(hug:368,hug:18) f[] "Rule"
+          31bb28a1d7c4f8d6 al(h,y(c)) mref(31bb28a1d7c4f8d6) p(0,0) s(368,18) f[(412618eb8421c279,tok(color.surface,#28282C))] clip "Frame 22"
+            28f611c095278aa0 t("─ today ──────────────────────────────────────────",JetBrains Mono,14,r,align(l),lh(1.25)) mref(28f611c095278aa0) p(0,0.25) s(hug:420,hug:17.5) f[(16630ccb0bbd0b7d,tok(color.tree.guide,#43434A))] $typography.row "Rule text"
+              spans[(2,7,$color.tree.dim)]

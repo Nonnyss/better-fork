@@ -1,0 +1,5 @@
+        db50b17df63ee5f9 fr comp axes[state[rest,focus]] p(0,90.8) s(248.02,58) f[] st[(9e929684712524f6,#7C6BF0,w(1),dash(10,5))] rd(16) "Button"
+          dbdfbf584e4ef664 al(h,y(c),pad(0:$spacing.none,4:$spacing.xs,0:$spacing.none,4:$spacing.xs)) variant(state(rest)) p(20,20) s(hug:92.01,18) f[(eb58ad5011507aa3,tok(color.menu.face,#C0C0C0))] "Frame 29"
+            fb9d6466cb44b0a4 t("[ Delete ]",JetBrains Mono,14,r,align(l),lh(1.25)) mref(fb9d6466cb44b0a4) p(4,0.25) s(hug:84.01,hug:17.5) f[(9e3731761bf1eecd,tok(color.menu.danger,#8B1A1A))] $typography.row "Label"
+          197a068f31501bbc al(h,y(c),pad(0:$spacing.none,4:$spacing.xs,0:$spacing.none,4:$spacing.xs)) variant(state(focus)) p(136.01,20) s(hug:92.01,18) f[(ea14ab8a9314245c,tok(color.menu.bar,#D77757))] "Frame 30"
+            98d439418da30538 t("[ Cancel ]",JetBrains Mono,14,b,align(l),lh(1.25)) mref(fb9d6466cb44b0a4) p(4,0.25) s(hug:84.01,hug:17.5) f[(f26e217a876cfb7b,tok(color.on-menu.bar,#F8F8F9))] $typography.row.current "Label"

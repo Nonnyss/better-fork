@@ -1,0 +1,5 @@
+      491722e1480e1529 fr comp p(0,0) s(hug:124,hug:90.3) f[] "Swatch"
+        902bbb7bebbe343a al(v,g(4:$spacing.xs)) mref(902bbb7bebbe343a) p(0,0) s(124,hug:90.3) f[] "Frame 14"
+          a200db982942a0ea r mref(a200db982942a0ea) p(0,0) s(fill,48) ext(124,) f[(3ff8e5e6b5040ba4,tok(color.status.working,#B1B9F9))] st[(2a1fe9e76c2bf61f,tok(color.outline.variant,#43434A),w(1:$stroke.width.subtle))] "Chip"
+          b66ececeba36c234 t("✻ working",JetBrains Mono,14,r,align(l),lh(1.25)) mref(b66ececeba36c234) p(0,52) s(hug:77.1,hug:17.5) f[(80034d313ff947cf,tok(color.text.primary,#E0E0E2))] $typography.row "Glyph"
+          1fd74886939ee0e6 t("color.status.working",Manrope,12,m,align(l),lh(1.4)) mref(1fd74886939ee0e6) p(0,73.5) s(fill,hug:16.8) ext(124,) f[(700709abc4ae661c,tok(color.text.secondary,#C5C5C9))] $typography.doc.label "Token"

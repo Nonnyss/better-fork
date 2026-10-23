@@ -2,3 +2,4 @@ Styles/.gen/
 .brilliant/trash/
 .brilliant/chats/
 node_modules/
+.claude/worktrees/

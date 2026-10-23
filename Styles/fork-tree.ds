@@ -17,7 +17,7 @@ color.success: green.mid
 color.error:   rose.mid
 
 // Session status, one role per Status in hooks/look.ts (LOOK). Change both together.
-//   blocked ?   working ●   failed ✗   idle ○   done ✓   stopped ■   gone ·
+//   blocked ✻   working ✻   failed •   idle ○   done •   stopped •   gone ·
 color.status.blocked: amber.mid
 color.status.working: secondary.mid
 color.status.failed:  rose.mid
@@ -45,7 +45,7 @@ color.on-current:    neutral.50
 color.menu.face:     #C0C0C0
 color.menu.ink:      #000000
 color.menu.hint:     #505050
-color.menu.shadow:   #6A6A6A
+color.menu.shadow:  #121214
 color.menu.bar:      primary.mid
 color.on-menu.bar:   neutral.50
 
@@ -63,3 +63,25 @@ pin: primary, secondary,
      color.status.done, color.status.idle, color.status.stopped,
      color.current, color.selection, color.tree.dim, color.tree.label,
      color.menu.face, color.menu.bar
+
+// v2: working is a live spinner, Claude Code's own frames · ✢ ✳ ✶ ✻ ✽ at 120 ms,
+// drawn ✻ when still. Indent guides are one step quieter than dim labels.
+color.tree.guide:   neutral.subtle
+// ★ a starred session. Claude orange, the same hue as the current bar.
+color.star:         primary.mid
+// The dim italic line under the selected row: what a ? session is asking.
+color.needs:        amber.soft
+// A search hit inside a row label, underlined.
+color.match:        amber.mid
+// Switching: the target row's block-shade sweep on a faint orange wash.
+color.opening:      primary.mid
+color.opening.wash: primary.hint
+// ░ placeholder bars in the transcript skeleton while a session resumes.
+color.skeleton:     neutral.faint
+// Key bar: the key glyph bright on the pane, its label on the silver menu face.
+color.key:          neutral.intense
+// DOS menu extras, frozen like the rest of the menu.
+color.menu.danger:  #8B1A1A
+color.menu.needs:   #6B4A00
+color.menu.rule:    #808080
+color.menu.ok:      #2E5E36

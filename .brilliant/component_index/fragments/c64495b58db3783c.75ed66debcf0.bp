@@ -1,0 +1,5 @@
+        c64495b58db3783c fr comp p(0,142.8) s(hug:54.02,hug:18) f[] "Key"
+          60e4e9eb2a31274b al(h,y(c),g(4)) mref(60e4e9eb2a31274b) p(0,0) s(hug:54.02,18) f[(e1cbff8cdbd96e81,tok(color.surface,#28282C))] "Frame 25"
+            6dc37a74c101b8f5 t("⏎",JetBrains Mono,14,b,align(l),lh(1.25)) mref(6dc37a74c101b8f5) p(0,0.25) s(hug:8.41,hug:17.5) f[(8fde2fa956da4fc6,tok(color.key,#F8F8F9))] $typography.row.current "Key"
+            32bea34df036b7f1 al(h,pad(0:$spacing.none,4:$spacing.xs,0:$spacing.none,4:$spacing.xs)) mref(32bea34df036b7f1) p(12.41,0) s(hug:41.61,18) f[(2f28045bb7f5586e,tok(color.menu.face,#C0C0C0))] "Chip"
+              ed75909d99bf9b64 t("open",JetBrains Mono,14,r,align(l),lh(1.25)) mref(ed75909d99bf9b64) p(4,0) s(hug:33.61,hug:17.5) f[(bb395ad4f5aa147a,tok(color.menu.ink,#000000))] $typography.row "Label"

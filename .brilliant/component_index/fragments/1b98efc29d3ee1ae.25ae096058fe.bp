@@ -1,0 +1,26 @@
+        1b98efc29d3ee1ae fr comp axes[state[rest,current,selected,child,hidden,opening]] p(0,24.8) s(408,208) f[] st[(9192a923830bf4a3,#7C6BF0,w(1),dash(10,5))] rd(16) "Row"
+          8a7f13518561b493 al(h,y(c)) variant(state(rest)) p(20,20) s(368,18) f[(733ef86531a8e676,tok(color.surface,#28282C))] "Frame 15"
+            ff5943d6331584a8 t("▾✻ #182 auth-refactor",JetBrains Mono,14,r,align(l),lh(1.25),clamp(1)) mref(ff5943d6331584a8) p(0,0.25) s(fill,hug:17.5) ext(326,) f[(bb2ca5042a4c18f7,tok(color.text.primary,#E0E0E2))] $typography.row "Label"
+              spans[(0,1,$color.tree.dim),(1,2,$color.status.working)]
+            8ecd4c241869c5c9 t("⋯  5m",JetBrains Mono,14,r,align(l),lh(1.25)) mref(8ecd4c241869c5c9) p(326,0.25) s(hug:42,hug:17.5) f[(a5946cc26729cfcc,tok(color.tree.dim,#55555D))] $typography.row "Age"
+          a6ac38f8e04260e2 al(h,y(c)) variant(state(current)) p(20,50) s(368,18) f[(f5d808ad02dd8755,tok(color.current,#D77757))] "Frame 16"
+            12781c9de6d70d17 t(" ✻ better-fork-b8",JetBrains Mono,14,b,align(l),lh(1.25),clamp(1)) mref(ff5943d6331584a8) p(0,0.25) s(fill,hug:17.5) ext(326,) f[(6e32ca4267bce4d8,tok(color.on-current,#F8F8F9))] $typography.row.current "Label"
+            bacf6cd82fb72fcc t("⋯  1m",JetBrains Mono,14,b,align(l),lh(1.25)) mref(8ecd4c241869c5c9) p(326,0.25) s(hug:42,hug:17.5) f[(f9acc5423d793006,tok(color.on-current,#F8F8F9))] $typography.row.current "Age"
+          e6e949acb03da48f al(h,y(c)) variant(state(selected)) p(20,80) s(368,18) f[(52f1e7406e7d4f3a,tok(color.surface,#28282C))] "Frame 17"
+            ecab27384d2d30ae t(" ✻ ",JetBrains Mono,14,r,align(l),lh(1.25)) mref(ff5943d6331584a8) p(0,0.25) s(hug:26.7,hug:17.5) f[(42acf7cf37ba1fa9,tok(color.status.blocked,#FE9A00))] $typography.row "Glyph"
+            f27be9b89e39097c al(h,pad(0:$spacing.none,4:$spacing.xs,0:$spacing.none,4:$spacing.xs)) mref(f27be9b89e39097c) p(26.7,0) s(hug:209.61,18) f[(5555640cd23ab49e,tok(color.selection,#F0F0F1))] "Inverse"
+              90579031195a77e6 t("better-naming-session-75",JetBrains Mono,14,r,align(l),lh(1.25)) mref(90579031195a77e6) p(4,0) s(hug:201.61,hug:17.5) f[(1f059b139fddc26f,tok(color.on-selection,#28282C))] $typography.row "Label"
+            fa646f2ce4df402c al(h) mref(fa646f2ce4df402c) p(236.31,8.5) s(fill,1) ext(89.69,) f[] "Spacer"
+            758df55a0ba15592 t("⋯  9m",JetBrains Mono,14,r,align(l),lh(1.25)) mref(8ecd4c241869c5c9) p(326,0.25) s(hug:42,hug:17.5) f[(afd803e0eddca23c,tok(color.tree.dim,#55555D))] $typography.row "Age"
+          bd2cd59b14d3072a al(h,y(c)) variant(state(child)) p(20,110) s(368,18) f[(1694f648589035fc,tok(color.surface,#28282C))] "Frame 18"
+            f1edbf7fc991855d t(" ├─• ⑂1 fix-q6-answer",JetBrains Mono,14,r,align(l),lh(1.25),clamp(1)) mref(ff5943d6331584a8) p(0,0.25) s(fill,hug:17.5) ext(326,) f[(1b7d100050e8ffe6,tok(color.text.secondary,#C5C5C9))] $typography.row "Label"
+              spans[(1,3,$color.tree.guide),(3,4,$color.status.done)]
+            ba06d9763671cea0 t("⋯  9h",JetBrains Mono,14,r,align(l),lh(1.25)) mref(8ecd4c241869c5c9) p(326,0.25) s(hug:42,hug:17.5) f[(e8be2e57126054f6,tok(color.tree.dim,#55555D))] $typography.row "Age"
+          9e3962c244e8a8a0 al(h,y(c)) variant(state(hidden)) p(20,140) s(368,18) f[(16d55351336647e1,tok(color.surface,#28282C))] "Frame 19"
+            f861f947a72615dc t("◌✻ wazuh-agent-fc",JetBrains Mono,14,r,align(l),lh(1.25),clamp(1)) mref(ff5943d6331584a8) p(0,0.25) s(fill,hug:17.5) ext(326,) f[(3af6160de6087337,tok(color.tree.dim,#55555D))] $typography.row "Label"
+              spans[(1,2,$color.needs)]
+            4cf589a0e5614d83 t("⋯ 41d",JetBrains Mono,14,r,align(l),lh(1.25)) mref(8ecd4c241869c5c9) p(326,0.25) s(hug:42,hug:17.5) f[(8f9c0d3f56d06719,tok(color.tree.guide,#43434A))] $typography.row "Age"
+          66015203777cbf6d al(h,y(c)) variant(state(opening)) p(20,170) s(368,18) f[(a6baa58ed5bb5216,tok(color.opening.wash,#4B1E0F))] "Frame 20"
+            4ae80a5d59729871 t(" ├─▓ ⑂1 implement-issue-413",JetBrains Mono,14,r,align(l),lh(1.25),clamp(1)) mref(ff5943d6331584a8) p(0,0.25) s(fill,hug:17.5) ext(325.99,) f[(e23917b8e63feac9,tok(color.text.primary,#E0E0E2))] $typography.row "Label"
+              spans[(1,3,$color.tree.dim),(3,4,$color.opening)]
+            af41d0402e1d6333 t("▒▓█▓▒",JetBrains Mono,14,r,align(l),lh(1.25)) mref(8ecd4c241869c5c9) p(325.99,0.25) s(hug:42.01,hug:17.5) f[(bd39d149ac579384,tok(color.opening,#D77757))] $typography.row "Age"

@@ -1,5 +1,5 @@
         a5bf4119a3263aeb fr comp p(0,90.3) s(hug:193,hug:68.5) f[] "Menu"
-          1020f5ba327d0347 al(v,g(0:$spacing.none),pad(8:$spacing.sm,0:$spacing.none,8:$spacing.sm,0:$spacing.none)) mref(1020f5ba327d0347) p(0,0) s(hug:193,hug:68.5) f[(24c3e4a35c7553d7,tok(color.menu.face,#C0C0C0))] st[(9aaa43ed2951f958,tok(color.menu.ink,#000000),w(1:$stroke.width.subtle),pos(i))] shadow(tok(color.menu.shadow,#6A6A6A),o(1),x(8),y(18),blur(0),id(82a8a1330766ba01)) "Frame 7"
+          1020f5ba327d0347 al(v,g(0:$spacing.none),pad(8:$spacing.sm,0:$spacing.none,8:$spacing.sm,0:$spacing.none)) mref(1020f5ba327d0347) p(0,0) s(hug:193,hug:68.5) f[(24c3e4a35c7553d7,tok(color.menu.face,#C0C0C0))] st[(9aaa43ed2951f958,tok(color.menu.ink,#000000),w(1:$stroke.width.subtle),pos(i))] shadow(tok(color.menu.shadow,#121214),o(1),x(8),y(18),blur(0),id(82a8a1330766ba01)) "Frame 7"
             411ce74452b207b3 inst("Menu Item") at(state(hover)) p(0,8) ext(193,17.5) "Frame 6"
             8d72eab095601c8b inst("Menu Item",emb,al(h,x(sb),y(c),g(0:$spacing.none),pad(0:$spacing.none,16:$spacing.lg,0:$spacing.none,16:$spacing.lg))) at(state(rest)) p(0,25.5) s(193,hug:17.5) f[(d864129e0cb15ba4,tok(color.menu.face,#C0C0C0))] "Frame 5"
               6742a2b540e5bec3 al(h,g(0:$spacing.none),pad(0:$spacing.none)) mref(221917cbd0a3ea11) p(16,0) s(hug:126.03,hug:17.5) f[] "Label"
