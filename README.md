@@ -6,7 +6,7 @@
 
 <img src="docs/images/pane.png" alt="The better-fork pane: project and all tabs, 3 sessions need you and 2 are working, starred sessions pinned on top, the current session on an orange bar, and a key bar at the foot" width="460">
 
-[Features](#features) · [Install](#install) · [Keys](#keys) · [How it works](#how-it-works) · [Design](#design) · [Development](#development)
+[Features](#features) · [Install](#install) · [Mouse](#mouse) · [How it works](#how-it-works) · [Design](#design) · [Development](#development)
 
 </div>
 
@@ -19,12 +19,12 @@ Fork a session a few times and `/resume` turns into a flat list of look-alike na
 ### See what needs you
 
 ```
-✻ working   ? needs you   ✓ done   ✗ failed   ○ idle   ■ stopped   · gone
+✻ working   ✻ needs you   • done   • failed   ○ idle   • stopped   · gone
 ```
 
 The marks are the same ones Claude Code uses in its own tabs. Working sessions spin; the rest stay still. The header counts what needs you and what is working, and the selected row spells out the question it is waiting on.
 
-When a session asks something or finishes a turn, a toast says so, never for the session you are already in. Several at once fold into one line. A question stays until you look; the rest leave after six seconds.
+When a session asks something or finishes a turn, a toast says so, never for the session you are already in. Several at once fold into one line. A question stays for fifteen seconds; the rest leave after six.
 
 <p align="center">
   <img src="docs/images/toasts.png" alt="Three toasts: one session needs you and asks 'Merge #427 now?', one is done, and three more finished folded into one" width="420">
@@ -32,7 +32,7 @@ When a session asks something or finishes a turn, a toast says so, never for the
 
 ### Act on any row
 
-Press `m`, or click the `⋯` column, and the menu opens on what the session is asking. Open it here or in a new tab, star it, rename it, hide it, copy its id, or delete it.
+Click the `⋯` column and the menu opens on what the session is asking. Open it here or in a new tab, star it, rename it, hide it, copy its id, or delete it.
 
 <table>
   <tr>
@@ -40,7 +40,7 @@ Press `m`, or click the `⋯` column, and the menu opens on what the session is 
     <td width="50%"><img src="docs/images/delete.png" alt="The delete dialog: it stops the session and moves the transcript to the Trash, its two forks stay, and Cancel is focused"></td>
   </tr>
   <tr>
-    <td><b>The menu.</b> Silver, hard shadow, one key per item. The footer names the folder the session opens into.</td>
+    <td><b>The menu.</b> Silver, hard shadow, a key label per item. The footer names the folder the session opens into.</td>
     <td><b>Delete.</b> The transcript goes to the Trash, Cancel has focus, and the forks move up a level instead of vanishing.</td>
   </tr>
 </table>
@@ -55,7 +55,7 @@ Rename edits only the slug. The `#149⑂1` lineage stays locked, so the tree nev
     <td width="50%"><img src="docs/images/hidden.png" alt="Hidden sessions: the eye in the tab line shows 27, and the hidden sessions come back dim under their own rule"></td>
   </tr>
   <tr>
-    <td><b><code>/</code> to filter.</b> Matches stay bright, their parents stay dim so the tree still reads. <code>esc</code> clears.</td>
+    <td><b><code>/</code> to filter.</b> Matches stay bright, their parents stay dim so the tree still reads. Empty the field to clear.</td>
     <td><b>Hide.</b> A hidden session drops out of the tree and every count, so <i>need you</i> means now. The eye brings them back.</td>
   </tr>
 </table>
@@ -94,22 +94,20 @@ The pane opens in every new session. Run `/better-fork` to open it by hand.
 > [!TIP]
 > The mod is read straight from the clone. After a pull, run `/reload-plugins` in each open session. A session still on the old copy says so on its status line.
 
-## Keys
+## Mouse
 
-|   Key   | Action                | Mouse           |
-| :-----: | --------------------- | --------------- |
-| `↑` `↓` | Move the selection    |                 |
-|   `⏎`   | Open in this terminal | Click the row   |
-|   `t`   | Open in a new tab     |                 |
-|   `m`   | Open the row menu     | Click `⋯`       |
-| `←` `→` | Fold or unfold        | Click the caret |
-|   `/`   | Filter by name        | Click `find`    |
-|   `s`   | Star or unstar        |                 |
-|   `r`   | Rename                |                 |
-|   `h`   | Hide                  |                 |
-|   `.`   | Show hidden sessions  | Click the eye   |
-|   `c`   | Copy the session id   |                 |
-|   `d`   | Delete                |                 |
+The sidebar is driven by the mouse. The letters in the menu and the key bar are labels, not shortcuts: a single key typed into the sidebar would fight Claude Code's prompt for it.
+
+| Action                                                 | Click                                        |
+| ------------------------------------------------------ | -------------------------------------------- |
+| Open in this terminal                                  | The row                                      |
+| Fold or unfold                                         | The caret                                    |
+| Open in a new tab, star, rename, hide, copy id, delete | `⋯`, then the item                           |
+| Filter by name                                         | `/ find` in the header, then type; `⏎` opens |
+| Show hidden sessions                                   | The eye                                      |
+| Save or cancel a rename                                | `⏎ save` or `esc cancel` under the field     |
+
+A menu closes when the pointer leaves the sidebar.
 
 ## How it works
 
@@ -131,7 +129,7 @@ better-fork/
 │   ├── tree.ts         sessions → rows, pure
 │   ├── look.ts         glyphs, colours, row geometry
 │   ├── switch.ts       open here or in a new tab
-│   └── tree-view.tsx   drawing thread: pointer, keys, menu
+│   └── tree-view.tsx   drawing thread: pointer, menu, rename field
 └── types/index.d.ts
 ```
 

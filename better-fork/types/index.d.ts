@@ -8,6 +8,8 @@ export type Row = {
   /** Rails of the ancestors; the connector of this row follows it. */
   indent: string
   connector: '' | '├' | '└'
+  /** Levels below a root: what search uses to keep a match's ancestors. */
+  depth: number
   status: Status
   label: string
   age: string
@@ -15,11 +17,22 @@ export type Row = {
   /** How many rows sit below this one (what a fold hides); 0 for a leaf. */
   below: number
   isFolded: boolean
+  isStarred?: boolean
+  isHidden?: boolean
+  /** A section's own rule line ("★ starred", "◌ hidden · 3"): no session behind it. */
+  isRule?: boolean
+  /** The fork number the naming hook gave it ("182⑂2"); a rename keeps it. */
+  lineage?: string
+  /** What a blocked session asks the person, from its fleet job. */
+  needs?: string
   target?: Target
 }
 
+/** The switch under way: the row it opens and the step it is on. */
+export type Opening = { id: string; step: string }
+
 declare module 'claude-code' {
   interface PluginState {
-    'better-fork': { rows: Row[] }
+    'better-fork': { rows: Row[]; all: Row[]; opening: Opening | null; query: string }
   }
 }

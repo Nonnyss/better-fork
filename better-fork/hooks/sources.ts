@@ -3,8 +3,11 @@ import type { EngineInterface } from 'claude-code'
 import type { Status } from '../types'
 import type { Session } from './tree'
 
-const JOB_STATUS: Record<string, Status> = { blocked: 'blocked', working: 'working', done: 'done', failed: 'failed', stopped: 'stopped' }
+const JOB_STATUS: Record<string, Status> = { blocked: 'blocked', working: 'working', running: 'working', done: 'done', failed: 'failed', stopped: 'stopped' }
 const LIVE_STATUS: Record<string, Status> = { busy: 'working', waiting: 'blocked' }
+
+// The fleet view counts a job as waiting when either field says so: a job can be `working` while its tempo is `blocked`.
+const jobStatus = (j: { state?: string; tempo?: string }): Status => (j.tempo === 'blocked' ? 'blocked' : (JOB_STATUS[j.state ?? ''] ?? 'idle'))
 
 async function readJson($: EngineInterface, path: string): Promise<any> {
   try {
@@ -26,28 +29,38 @@ async function readChanged($: EngineInterface, path: string, mtimeMs: number): P
   return value
 }
 
-/** Every session under `home`/.claude: fleet jobs merged with live processes, keyed by session id. */
-export async function readSessions($: EngineInterface, home: string): Promise<Session[]> {
+// Fleet jobs as last read: a quick scan rereads only the live sessions and reuses these.
+let jobs: any[] = []
+let jobPaths: string[] = []
+
+/**
+ * Every session under `home`/.claude: fleet jobs merged with live processes, keyed by session id.
+ * `withJobs` false rereads only ~/.claude/sessions, the few files that change while a session works.
+ */
+export async function readSessions($: EngineInterface, home: string, withJobs = true): Promise<Session[]> {
   const seen = new Set<string>()
   const byId = new Map<string, Session>()
-  // Fleet jobs: what the background-sessions view lists. A folder's listing carries no mtime of its file, so each is stat'ed.
-  const jobsDir = `${home}/.claude/jobs`
-  const dirs = (await $.fs.list(jobsDir).catch(() => [])).filter(d => d.kind === 'dir')
-  const jobs = await Promise.all(
-    dirs.map(async d => {
-      const path = `${jobsDir}/${d.name}/state.json`
-      seen.add(path)
-      const stat = await $.fs.stat(path).catch(() => undefined)
-      return stat ? readChanged($, path, stat.mtimeMs) : undefined
-    }),
-  )
+  if (withJobs) {
+    // Fleet jobs: what the background-sessions view lists. A folder's listing carries no mtime of its file, so each is stat'ed.
+    const jobsDir = `${home}/.claude/jobs`
+    const dirs = (await $.fs.list(jobsDir).catch(() => [])).filter(d => d.kind === 'dir')
+    jobPaths = dirs.map(d => `${jobsDir}/${d.name}/state.json`)
+    jobs = await Promise.all(
+      jobPaths.map(async path => {
+        const stat = await $.fs.stat(path).catch(() => undefined)
+        return stat ? readChanged($, path, stat.mtimeMs) : undefined
+      }),
+    )
+  }
+  for (const path of jobPaths) seen.add(path)
   for (const j of jobs) {
     if (!j?.sessionId) continue
     byId.set(j.sessionId, {
       sessionId: j.sessionId,
       name: j.name,
       intent: j.intent,
-      status: JOB_STATUS[j.state] ?? 'idle',
+      status: jobStatus(j),
+      needs: typeof j.needs === 'string' && j.needs ? j.needs : undefined,
       parentId: j.forkParentSessionId,
       updatedAt: Date.parse(j.updatedAt) || 0,
       target: { sessionId: j.sessionId, cwd: j.cwd, isBg: true, short: j.daemonShort },
@@ -72,6 +85,7 @@ export async function readSessions($: EngineInterface, home: string): Promise<Se
       name: s.name ?? job?.name,
       intent: job?.intent,
       status: LIVE_STATUS[s.status] ?? job?.status ?? 'idle',
+      needs: job?.needs,
       parentId: job?.parentId,
       updatedAt: Math.max(s.updatedAt ?? 0, job?.updatedAt ?? 0),
       target: { sessionId: s.sessionId, cwd: s.cwd, isBg, isLive: true, short: s.jobId ?? job?.target?.short, pid: isBg ? undefined : s.pid },

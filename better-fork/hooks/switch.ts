@@ -35,7 +35,11 @@ const NEW_TAB = `on run argv
   end tell
 end run`
 
-const quote = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`
+// Only what the shell would read as more than one word gets quotes, so a plain id stays readable in a copied command.
+const quote = (s: string) => (/^[\w@%+=:,./~-]+$/.test(s) ? s : `'${s.replace(/'/g, `'\\''`)}'`)
+
+/** Where Claude Code keeps a project's transcripts: the path with every non-alphanumeric as '-'. */
+export const transcriptOf = (home: string, cwd: string, sessionId: string) => `${home}/.claude/projects/${cwd.replace(/[^a-zA-Z0-9]/g, '-')}/${sessionId}.jsonl`
 
 async function focusTab($: EngineInterface, pid: number): Promise<boolean> {
   const ps = await $.process.run(['ps', '-o', 'tty=', '-p', String(pid)])
@@ -45,8 +49,10 @@ async function focusTab($: EngineInterface, pid: number): Promise<boolean> {
   return r.stdout.trim() === 'ok'
 }
 
-const newTabCommand = (target: Target) =>
-  target.isBg ? `claude attach ${target.short ?? target.sessionId.slice(0, 8)}` : `${target.cwd ? `cd ${quote(target.cwd)} && ` : ''}claude --resume ${target.sessionId}`
+// Every value comes from a JSON file on disk and is typed into a shell, so each is quoted. The cd first keeps
+// the session in its own project: its .mcp.json, settings and CLAUDE.md.
+export const newTabCommand = (target: Target) =>
+  (target.cwd ? `cd ${quote(target.cwd)} && ` : '') + (target.isBg ? `claude attach ${quote(target.short ?? target.sessionId.slice(0, 8))}` : `claude --resume ${quote(target.sessionId)}`)
 
 export async function openInNewTab($: EngineInterface, target: Target) {
   if (target.pid && (await focusTab($, target.pid))) return
@@ -58,36 +64,51 @@ export async function openInNewTab($: EngineInterface, target: Target) {
   $.ui.toast(`Copied: ${cmd}`)
 }
 
-// /resume looks only in this project's folder of transcripts, named after the project's path.
-async function resumableHere($: EngineInterface, home: string, sessionId: string): Promise<boolean> {
-  const root = await $.session.root()
-  return $.fs.exists(`${home}/.claude/projects/${root.replace(/[^a-zA-Z0-9]/g, '-')}/${sessionId}.jsonl`)
-}
+const tilde = (home: string, path: string) => (home && path.startsWith(home) ? `~${path.slice(home.length)}` : path)
 
 /**
- * Switches this terminal to the session. Nothing is stopped until /resume is
- * known to find it here: one of another project opens in a new tab instead.
+ * Switches this terminal to the session, in its own folder. /resume finds a
+ * transcript only under the project the session is in, so one kept under the
+ * session's own folder is reached by /cd there first; nothing is stopped until
+ * that move is known to have worked. One found nowhere opens in a new tab.
  * A session runs in one process at a time, so one live in another tab is
- * jumped to, and a background one mid-turn is left alone.
+ * jumped to, and a background one mid-turn is left alone. `step` names each
+ * stage as it starts, for the pane to show.
  */
-export async function openHere($: EngineInterface, home: string, row: Row, target: Target) {
+export async function openHere($: EngineInterface, home: string, row: Row, target: Target, step: (text: string) => void = () => {}) {
   if (row.isCurrent) return $.ui.toast('This is the session you are in.')
   if (target.pid) {
     if (await focusTab($, target.pid)) return $.ui.toast('It is open in another tab: switched to it.')
     return $.ui.toast('It is open in another terminal; close it there to resume it here.')
   }
-  if (!(await resumableHere($, home, target.sessionId))) {
-    $.ui.toast('It belongs to another project: opened in a new tab.')
+  if (target.isBg && target.isLive && row.status === 'working') {
+    $.ui.toast('Still working mid-turn, so it cannot move into this terminal: opened in a new tab.')
     return openInNewTab($, target)
   }
-  if (target.isBg && target.isLive) {
-    if (row.status === 'working') {
-      $.ui.toast('Still working mid-turn, so it cannot move into this terminal: opened in a new tab.')
+  const root = await $.session.root()
+  const cwd = target.cwd && target.cwd !== root && (await $.fs.exists(transcriptOf(home, target.cwd, target.sessionId))) ? target.cwd : undefined
+  if (!cwd && !(await $.fs.exists(transcriptOf(home, root, target.sessionId)))) {
+    $.ui.toast('Its transcript is not under its folder or this one: opened in a new tab.')
+    return openInNewTab($, target)
+  }
+  if (cwd) {
+    step(`cd ${tilde(home, cwd)}`)
+    await $.command.run({ command: 'cd', args: cwd })
+    if ((await $.session.root()) !== cwd) {
+      $.ui.toast(`Could not move this session to ${tilde(home, cwd)}: opened in a new tab.`)
       return openInNewTab($, target)
     }
-    const stop = await $.process.run(['claude', 'stop', target.short ?? target.sessionId])
-    if (stop.exitCode !== 0) return $.ui.toast(`Could not take it from the background: ${stop.stderr.trim() || stop.stdout.trim()}`)
   }
+  if (target.isBg && target.isLive) {
+    step('stop background job')
+    const stop = await $.process.run(['claude', 'stop', target.short ?? target.sessionId])
+    if (stop.exitCode !== 0) {
+      // Back where it was, so a failed switch leaves this session as it found it.
+      if (cwd) await $.command.run({ command: 'cd', args: root })
+      return $.ui.toast(`Could not take it from the background: ${stop.stderr.trim() || stop.stdout.trim()}`)
+    }
+  }
+  step('load transcript')
   const resumed = await $.command.run({ command: 'resume', args: target.sessionId })
   // shortcut: reads /resume's words, as command.run reports no status; read a status once it has one.
   if (/not found|no conversation/i.test(resumed.text ?? '')) $.ui.toast(`Could not resume it here. Get it back with: ${newTabCommand(target)}`)
