@@ -10,6 +10,8 @@ import { treeRows, type Session } from './tree'
 import type { Act } from './tree-view'
 
 const PANE = 'better-fork'
+// Under the pointer, the search field's ground: color.outline.variant in Styles/fork-tree.ds.
+const HOVER = '#43434A'
 type Filter = 'all' | 'project'
 const WIDTH = 40
 // A quick scan (live sessions only) each tick, the fleet's ~200 job files every JOBS_EVERY ticks.
@@ -278,25 +280,25 @@ export const register: Register = on => {
       </Button>
     )
     const project = root.split('/').pop() || 'this project'
+    const q = await read($, query)
     const header = (
       <Box flexDirection="column">
         <Box flexDirection="row">
           {tab('project', 'project')}
           {tab('all', 'all')}
           <Box flexGrow={1} />
-          {(hiddenCount > 0 || showHidden) && <Button key="eye" plain label={`${showHidden ? '◉' : '◌'} ${hiddenCount}`} dimColor={!showHidden} onPress={() => void act($, 'eye', {} as Row)} />}
-          <Text> </Text>
-          {/* The engine's own field: a click gives it every key and Esc hands them back, which a Client never gets. */}
+          {/* Padded labels: the pointer lights a chip, not ink pressed against the glyph. */}
+          {(hiddenCount > 0 || showHidden) && <Button key="eye" plain label={` ${showHidden ? '◉' : '◌'} ${hiddenCount} `} dimColor={!showHidden} onPress={() => void act($, 'eye', {} as Row)} />}
+          {/* The engine's own field: a click gives it every key and Esc hands them back, which a Client never gets.
+              A field shows no hover of its own (a click on a Button does not hand it the keys), so its Box lights. */}
           {Input && (
-            <Input
-              key="query"
-              label="/"
-              placeholder="find"
-              submitLabel="open"
-              value={await read($, query)}
-              onInput={(v: string) => void update($, query, () => v)}
-              onSubmit={(v: string) => void openFirst($, v)}
-            />
+            <Box key="find" flexDirection="row" hover={{ backgroundColor: HOVER }}>
+              <Text dimColor hover={{ dimColor: false }}>
+                {' / '}
+              </Text>
+              <Input key="query" placeholder="find" submitLabel="open" value={q} onInput={(v: string) => void update($, query, () => v)} onSubmit={(v: string) => void openFirst($, v)} />
+              <Text> </Text>
+            </Box>
           )}
         </Box>
         <Text wrap="truncate-middle">

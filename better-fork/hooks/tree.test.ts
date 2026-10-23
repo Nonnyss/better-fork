@@ -143,7 +143,13 @@ test('a hidden session leaves the tree and its forks move up; shown, it sits fla
   const rows = treeRows(sessions, 'x', NOW, {}, { hidden })
   expect(rows.map(draw)).toEqual([' ⑂1 implement-issue-413'])
   expect(rows.hidden).toBe(1)
-  expect(treeRows(sessions, 'x', NOW, {}, { hidden, showHidden: true }).map(drawn)).toEqual([' ⑂1 implement-issue-413', '[◌ hidden · 1]', '◌#149 wazuh-open-issues-triage'])
+  // Shown, they head the list, where the eye that showed them is.
+  expect(treeRows(sessions, 'x', NOW, {}, { hidden, showHidden: true, today: NOW - HOUR }).map(drawn)).toEqual([
+    '[◌ hidden · 1]',
+    '◌#149 wazuh-open-issues-triage',
+    '[today]',
+    ' ⑂1 implement-issue-413',
+  ])
 })
 
 test('unfolded for search, every fold opens and "older" lets its trees out', async () => {

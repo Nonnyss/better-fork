@@ -210,9 +210,18 @@ export function treeRows(sessions: Session[], currentId: string, now: number, fo
   const dayStart = marks.today ?? new Date(now).setHours(0, 0, 0, 0)
   const today = fresh.filter(r => r.latest >= dayStart)
   const earlier = fresh.filter(r => r.latest < dayStart)
+  const hidden = nodes.filter(isHidden)
+  const showHidden = !!marks.showHidden && !marks.unfold && hidden.length > 0
+  // Shown, the hidden head the list, next to the eye that showed them.
+  if (showHidden) {
+    rows.push(rule(HIDDEN_ID, `◌ hidden · ${hidden.length}`, hidden.length))
+    hidden.sort((a, b) => b.updatedAt - a.updatedAt)
+    for (const n of hidden) rows.push({ ...row(n, `◌${n.id}`), label: labelOf(n, true), isHidden: true })
+  }
   // A section alone needs no rule; "older" is its own.
-  const ruled = !marks.unfold && (starred.length > 0 || (today.length > 0 && earlier.length > 0))
-  if (starred.length && tops.length) rows.push(rule(STAR_ID, '★ starred'))
+  const sections = [showHidden, starred.length > 0, today.length > 0, earlier.length > 0].filter(Boolean).length
+  const ruled = !marks.unfold && (sections > 1 || (starred.length > 0 && older.length > 0))
+  if (starred.length && ruled) rows.push(rule(STAR_ID, '★ starred'))
   starred.forEach(r => walk(r, '', '', ' ', 0))
   for (const [id, label, list] of [
     [TODAY_ID, 'today', today],
@@ -226,13 +235,6 @@ export function treeRows(sessions: Session[], currentId: string, now: number, fo
     const label = `older · ${older.length} ${older.length === 1 ? 'tree' : 'trees'} quiet for 3 days`
     rows.push({ id: OLDER_ID, indent: '', connector: '', depth: 0, status: 'gone', label, age: '', isCurrent: false, below: older.length, isFolded: folded })
     if (!folded) older.forEach(r => walk(r, '', '', ' ', 0))
-  }
-
-  const hidden = nodes.filter(isHidden)
-  if (marks.showHidden && !marks.unfold && hidden.length) {
-    rows.push(rule(HIDDEN_ID, `◌ hidden · ${hidden.length}`, hidden.length))
-    hidden.sort((a, b) => b.updatedAt - a.updatedAt)
-    for (const n of hidden) rows.push({ ...row(n, `◌${n.id}`), label: labelOf(n, true), isHidden: true })
   }
   return rows
 }

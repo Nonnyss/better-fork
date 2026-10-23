@@ -251,10 +251,14 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
   }
 
   // The key bar's keys, laid out once per render so a click finds the one under it.
-  // A key, its label on a chip padded a cell each side, a cell between: "⏎ open  t tab ".
-  const keyBar = (KEYS[mode] ?? []).reduce<{ key: string; label: string; x: number; w: number }[]>((acc, [key, label]) => {
-    const x = acc.length ? acc.at(-1)!.x + acc.at(-1)!.w + 1 : 0
-    const w = cells(key) + cells(label) + 2
+  // A key, a cell, its label on a silver chip. The design pads the chip half a cell each side; a terminal
+  // has whole cells, so the chip takes a cell each side where the tree has room, else none and the keys sit two apart.
+  const keys = KEYS[mode] ?? []
+  const roomy = keys.reduce((n, [key, label]) => n + cells(key) + cells(label) + 4, -1) <= width
+  const chipPad = roomy ? ' ' : ''
+  const keyBar = keys.reduce<{ key: string; label: string; x: number; w: number }[]>((acc, [key, label]) => {
+    const x = acc.length ? acc.at(-1)!.x + acc.at(-1)!.w + (roomy ? 1 : 2) : 0
+    const w = cells(key) + 1 + cells(label) + 2 * chipPad.length
     return x + w <= width ? [...acc, { key, label, x, w }] : acc
   }, [])
 
@@ -648,10 +652,10 @@ const TreeView: ClientModule<ViewProps, State> = (props, surface) => {
         return (
           <Box flexDirection="row">
             {keyBar.flatMap((k, n) => [
-              ...(n ? [<Text> </Text>] : []),
-              <Text bold>{k.key}</Text>,
+              ...(n ? [<Text>{roomy ? ' ' : '  '}</Text>] : []),
+              <Text bold>{k.key} </Text>,
               <Text backgroundColor={FACE} color="black">
-                {` ${k.label} `}
+                {chipPad + k.label + chipPad}
               </Text>,
             ])}
           </Box>

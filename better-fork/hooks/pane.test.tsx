@@ -313,11 +313,36 @@ test('hide takes a session out of the tree and the counts; the eye brings it bac
 
   expect((await ui.find({ type: 'Text', text: /need you/ }))?.text).toMatch(/^. 0 need you/)
   expect(await ui.find({ type: 'Text', text: /a-very-long/, ...tree })).toBeUndefined()
-  expect((await ui.find({ type: 'Button', key: 'eye' }))?.props.label).toBe('◌ 1')
+  // Padded, so its hover is a chip rather than ink touching the glyph.
+  expect((await ui.find({ type: 'Button', key: 'eye' }))?.props.label).toBe(' ◌ 1 ')
 
+  // Shown, the hidden sessions open at the top: no scrolling down to find them.
   await ui.press({ key: 'eye' })
-  expect(await ui.find({ type: 'Text', text: /hidden · 1/, ...tree })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /#182⑂1 a-very/, ...tree })).toBeDefined()
+  const [first, second] = await lines(ui)
+  expect(first).toMatch(/hidden · 1/)
+  expect(second).toMatch(/#182⑂1 a-very/)
+  await ui.unmount()
+})
+
+test('the key bar spaces each key from its chip, and pads the chips where the tree has room', async ($, on) => {
+  await start($, on)
+  const narrow = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect((await lines(narrow)).at(-1)).toBe('⏎ open  t tab  / find  s star  m menu')
+  await narrow.unmount()
+
+  const wide = await $.ui.mount({ ...PANE, props: { ...PANE.props, bodyColumns: 60 }, surface: 'terminal' })
+  expect((await lines(wide)).at(-1)).toBe('⏎  open  t  tab  /  find  s  star  m  menu ')
+  await wide.unmount()
+})
+
+test('the "/ find" field lights under the pointer, so it reads as something to click', async ($, on) => {
+  await start($, on)
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+
+  // The Box's own ground lights too (checked in a terminal); a found Box does not report its hover.
+  const field = await ui.find({ type: 'Box', key: 'find' })
+  expect((field?.children?.[0] as { hover?: unknown } | undefined)?.hover).toEqual({ dimColor: false })
+  expect(await ui.find({ type: 'Input', key: 'query' })).toBeDefined()
   await ui.unmount()
 })
 
